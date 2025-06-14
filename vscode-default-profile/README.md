@@ -1,0 +1,1 @@
+Visual Studio Code 既定のプロファイル設定

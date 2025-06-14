@@ -1,0 +1,46 @@
+{
+  // ウィンドウ タイトル バーの外観を、OS またはカスタムでネイティブに調整（Chromebook用）
+  "window.titleBarStyle": "custom",
+  // 前回開いていたウィンドウを復元しない
+  "window.restoreWindows": "none",
+  // コマンド ランチャーをウィンドウ タイトルと共に表示しない
+  "window.commandCenter": false,
+  // すべてのウィンドウの既定のズーム レベルを調整
+  "window.zoomLevel": 2,
+  // ワークベンチで使用される配色テーマを Dark+ にする
+  "workbench.colorTheme": "Default Dark+",
+  // アクティブなタブの背景色を変更する
+  "workbench.colorCustomizations": {
+    "tab.activeBackground": "#666666cc"
+  },
+  // ピン留めされたタブを他のすべてのタブの上に表示する
+  "workbench.editor.pinnedTabsOnSeparateRow": true,
+  // ワークベンチで使用されるファイル アイコン テーマを Material にする
+  "workbench.iconTheme": "material-icon-theme",
+  // 空白文字,タブ文字が表示されなくなることを防ぐ
+  "editor.accessibilitySupport": "off",
+  // 角かっこのペアの彩色を有効にする
+  "editor.bracketPairColorization.enabled": true,
+  // エディターにインライン候補を自動的に表示する
+  "editor.inlineSuggest.enabled": true,
+  // エディターで空白文字を常に表示する
+  "editor.renderWhitespace": "all",
+  // スクロール中にエディターの上部に入れ子になった現在のスコープを表示する
+  "editor.stickyScroll.enabled": true,
+  // エクスプローラーで自動的に開いているファイルが選択されないようにする（別途 workbench.files.action.showActiveFileInExplorer ショートカットに割り当て）
+  "explorer.autoReveal": false,
+  // 現在の Git リポジトリの既定のリモートからコミットが自動的にフェッチする
+  "git.autofetch": true,
+  // (Copilot) を有効にする
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false,
+    "yaml": true
+  },
+  // ワークスペースの親フォルダーまたは開いているファイルでリポジトリを開きません
+  "git.openRepositoryInParentFolders": "never",
+  // GitHub Copilot はコードの自動補完を提供する
+  "github.copilot.editor.enableAutoCompletions": true,
+}
