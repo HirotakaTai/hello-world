@@ -64,12 +64,15 @@ def assistant(state: MessagesState):
 
 # === LangGraphのグラフを作成します ===
 
+import io
+
+import matplotlib.pyplot as plt
 from IPython.display import Image
-from IPython.display import display
 from langgraph.graph import START
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import ToolNode
 from langgraph.prebuilt import tools_condition
+from PIL import Image
 
 # Graph
 builder = StateGraph(MessagesState)
@@ -90,7 +93,13 @@ builder.add_edge("tools", "assistant")
 react_graph = builder.compile()
 
 # Show
-display(Image(react_graph.get_graph(xray=True).draw_mermaid_png()))
+# display(Image(react_graph.get_graph(xray=True).draw_mermaid_png()))
+png_data = react_graph.get_graph(xray=True).draw_mermaid_png()
+image = io.BytesIO(png_data)
+img = Image.open(image)
+plt.imshow(img)
+plt.axis("off")  # 軸を非表示にする
+plt.show()
 
 # === 実行 ===
 
