@@ -1,4 +1,0 @@
-- [Pythonパッケージ管理 [uv] 完全入門](https://speakerdeck.com/mickey_kubo/pythonpatukeziguan-li-uv-wan-quan-ru-men)
-- [https://zenn.dev/yareyare/articles/d67aa75b37537c](https://zenn.dev/yareyare/articles/d67aa75b37537c)
-- [uv, ruff, devcontainer, Claude Codeを使ったモダンなPython開発環境のテンプレート](https://zenn.dev/mjun0812/articles/0ae2325d40ed20)
-- [AIエージェントにも正しく使ってほしいPython環境管理ツール「uv」最新情報ガイド](https://qiita.com/ootakazuhiko/items/4fa2406534777d86f333)

@@ -1,2 +1,5 @@
-# hello-world
-Hello World
+# Hello World
+
+新規プロジェクト作成時の作成サンプル。
+
+雑多な実験コード置き場。

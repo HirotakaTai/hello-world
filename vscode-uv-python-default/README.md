@@ -1,4 +1,4 @@
-# MEMO
+# メモ
 
 ```sh
 uv init
