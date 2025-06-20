@@ -53,7 +53,7 @@ llm_with_tools = llm.bind_tools(tools)
 
 # System message
 sys_msg = SystemMessage(
-    content="あなたは、一連の入力に対して算術演算を実行するタスクを与えられた親切なアシスタントでぇす。"
+    content="あなたは、一連の入力に対して算術演算を実行するタスクを与えられた親切なアシスタントです。"
 )
 
 

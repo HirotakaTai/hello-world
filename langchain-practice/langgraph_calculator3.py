@@ -14,11 +14,14 @@ from typing import Literal
 from typing import TypedDict
 
 from dotenv import load_dotenv
+from langchain.output_parsers import PydanticOutputParser
 from langchain_core.messages import AIMessage
 from langchain_core.messages import HumanMessage
 from langchain_core.messages import SystemMessage
 from langchain_openai import ChatOpenAI
 from langgraph.graph import StateGraph
+from pydantic import BaseModel
+from pydantic import Field
 
 load_dotenv()
 
@@ -55,38 +58,67 @@ class CalcState(TypedDict):
 # ------------- ノード関数の定義 -------------
 
 
+# 計算ステップを表すPydanticモデル
+class CalculationStep(BaseModel):
+    operation: Literal["add", "subtract", "multiply", "divide"] = Field(
+        ...,
+        description="実行する演算（add:足し算, subtract:引き算, multiply:掛け算, divide:割り算）",
+    )
+    value1: str = Field(
+        ...,
+        description="最初の値。最初のステップでは数値、それ以降は 'result' を使用して前回の計算結果を参照",
+    )
+    value2: float = Field(..., description="二番目の値（数値）")
+
+
+class CalculationSteps(BaseModel):
+    steps: List[CalculationStep] = Field(
+        ..., description="実行すべき計算ステップのリスト"
+    )
+
+
 def extract_calculation_steps(state: CalcState) -> CalcState:
     """
-    入力プロンプトから計算ステップを抽出するノード
-
-    このノードはLLMを使って自然言語から計算手順を構造化されたデータに変換します。
+    入力プロンプトから計算ステップを抽出するノード（PydanticOutputParserを使用）
     """
-    # LLMの初期化（GPT-3.5-turboを使用）
+    # パーサーの設定
+    parser = PydanticOutputParser(pydantic_object=CalculationSteps)
+
+    # LLMの初期化
     llm = ChatOpenAI(model="gpt-3.5-turbo")
 
-    # LLMに渡すシステムプロンプトを作成
-    system_prompt = """
+    # フォーマット手順（parser.get_format_instructions()で自動生成）
+    format_instructions = parser.get_format_instructions()
+
+    # システムプロンプト
+    system_prompt = f"""
     あなたは計算ステップを抽出するAIアシスタントです。
     ユーザーの自然言語による計算要求から、実行すべき計算ステップを順番に抽出してください。
     
-    出力は以下の形式のJSONリストにしてください：
-    [
-        {
-            "operation": "add"（足し算）、"subtract"（引き算）、"multiply"（掛け算）、"divide"（割り算）のいずれか,
-            "value1": 最初の数値（最初のステップでは入力値、それ以降は前回の計算結果を表す "result" を使用）,
-            "value2": 二番目の数値
-        },
-        ...
-    ]
+    {format_instructions}
     
     例：
     入力: "5に3を足して、その結果に2を掛けてください"
-    出力: [{"operation": "add", "value1": 5, "value2": 3}, {"operation": "multiply", "value1": "result", "value2": 2}]
+    出力: 
+    ```json
+    {{
+      "steps": [
+        {{"operation": "add", "value1": "5", "value2": 3}},
+        {{"operation": "multiply", "value1": "result", "value2": 2}}
+      ]
+    }}
+    ```
     
     入力: "10を2で割って、その後に5を引いてください"
-    出力: [{"operation": "divide", "value1": 10, "value2": 2}, {"operation": "subtract", "value1": "result", "value2": 5}]
-    
-    必ず有効なJSONのみを返してください。
+    出力:
+    ```json
+    {{
+      "steps": [
+        {{"operation": "divide", "value1": "10", "value2": 2}},
+        {{"operation": "subtract", "value1": "result", "value2": 5}}
+      ]
+    }}
+    ```
     """
 
     # LLMに送信するメッセージを作成
@@ -98,14 +130,16 @@ def extract_calculation_steps(state: CalcState) -> CalcState:
     # LLMを呼び出して計算ステップを抽出
     response = llm.invoke(messages)
 
-    # LLMの応答からJSON部分を抽出して解析
     try:
-        # 応答テキストからJSONを抽出
-        response_text = response.content
-        # JSON文字列を解析してPythonオブジェクトに変換
-        steps = json.loads(response_text)
+        # パーサーでレスポンスを解析
+        parsed_output = parser.parse(response.content)
+        steps = [step.model_dump() for step in parsed_output.steps]
+
+        # 数値の型変換を処理（value1がresultでない場合のみ）
+        for step in steps:
+            if step["value1"] != "result":
+                step["value1"] = float(step["value1"])
     except Exception as e:
-        # JSON解析に失敗した場合は、エラーメッセージを表示して空のステップリストを設定
         print(f"ステップの解析に失敗しました: {e}")
         steps = []
 
@@ -459,7 +493,7 @@ def main():
     # 計算グラフの構築
     calculator = build_calculator_graph()
 
-    print(calculator.get_graph(xray=True).draw_mermaid())
+    # print(calculator.get_graph(xray=True).draw_mermaid())
 
     print("==== 四則演算計算機へようこそ！ ====")
     print("例: '5に3を足して、その結果に2を掛けてください'")
@@ -492,6 +526,7 @@ def main():
             # 結果の表示
             print("\n--- 計算過程 ---")
             for message in result["messages"]:
+                message.pretty_print()
                 if hasattr(message, "content"):
                     print(message.content)
 
