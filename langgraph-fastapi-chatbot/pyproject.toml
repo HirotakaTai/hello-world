@@ -1,0 +1,15 @@
+[project]
+name = "langgraph-fastapi-chatbot"
+version = "0.1.0"
+description = "LangChainとLangGraphを使用したFastAPIベースのチャットボット"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "langchain",
+    "langchain-openai",
+    "langgraph",
+    "fastapi",
+    "uvicorn",
+    "python-dotenv",
+    "jinja2"
+]
