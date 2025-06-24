@@ -8,7 +8,7 @@
 langgraph-pattern-practice/
 ├── base/
 │   └── langchain_base.py          # LangChainの基本実装
-├── patterns/                      # 各パターンの実装
+├── patterns/                      # 各パターンの基本実装
 │   ├── 01_augmented_llm/
 │   │   └── augmented_llm.py       # 拡張LLMパターン
 │   ├── 02_prompt_chaining/
@@ -23,7 +23,22 @@ langgraph-pattern-practice/
 │   │   └── evaluator_optimizer.py # 評価者・最適化者パターン
 │   └── 07_agents/
 │       └── agents.py              # 自律エージェントパターン
-├── main.py
+├── langgraph_patterns/            # LangGraphを活用した高度な実装
+│   ├── 01_augmented_llm/
+│   │   └── langgraph_augmented_llm.py
+│   ├── 02_prompt_chaining/
+│   │   └── langgraph_prompt_chaining.py
+│   ├── 03_routing/
+│   │   └── langgraph_routing.py
+│   ├── 04_parallelization/
+│   │   └── langgraph_parallelization.py
+│   ├── 05_orchestrator_workers/
+│   │   └── langgraph_orchestrator_workers.py
+│   ├── 06_evaluator_optimizer/
+│   │   └── langgraph_evaluator_optimizer.py
+│   └── 07_agents/
+│       └── langgraph_agents.py
+├── main.py                        # パターン選択式ランチャー
 ├── pyproject.toml
 ├── README.md
 └── .env                          # 環境変数（OpenAI APIキーなど）
@@ -50,6 +65,10 @@ OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 ## 📚 実装パターン
+
+### 🔰 基本実装（patterns/フォルダ）
+
+各パターンの基本的な実装です。LangChainを使用して、理解しやすい形で実装されています。
 
 ### 1. Augmented LLM（拡張LLM）
 **ファイル**: `patterns/01_augmented_llm/augmented_llm.py`
@@ -156,9 +175,111 @@ LLMが自律的に判断し、ツールを使用して複雑なタスクを実�
 python patterns/07_agents/agents.py
 ```
 
+## 🌟 LangGraph高度実装（langgraph_patterns/フォルダ）
+
+LangGraphを活用した、より高度で実用的な実装です。複雑なワークフロー管理や状態管理に優れています。
+
+### 1. LangGraph Augmented LLM
+**ファイル**: `langgraph_patterns/01_augmented_llm/langgraph_augmented_llm.py`
+
+**LangGraphの特徴を活用**:
+- StateGraphによる明確なワークフロー定義
+- ツール実行の自動化
+- 条件分岐による動的な処理経路選択
+- 実行状態の完全な管理
+
+**実行方法**:
+```bash
+python langgraph_patterns/01_augmented_llm/langgraph_augmented_llm.py
+```
+
+### 2. LangGraph Prompt Chaining
+**ファイル**: `langgraph_patterns/02_prompt_chaining/langgraph_prompt_chaining.py`
+
+**LangGraphの特徴を活用**:
+- 線形ワークフローの明確な定義
+- 各ステップ間の状態受け渡し
+- 実行ログの自動管理
+- エラーハンドリングの改善
+
+**実行方法**:
+```bash
+python langgraph_patterns/02_prompt_chaining/langgraph_prompt_chaining.py
+```
+
+### 3. LangGraph Routing
+**ファイル**: `langgraph_patterns/03_routing/langgraph_routing.py`
+
+**LangGraphの特徴を活用**:
+- 条件分岐による動的ルーティング
+- 複数の処理経路の管理
+- 分類結果に基づく自動振り分け
+- 各経路での専門的な処理
+
+**実行方法**:
+```bash
+python langgraph_patterns/03_routing/langgraph_routing.py
+```
+
+### 4. LangGraph Parallelization
+**ファイル**: `langgraph_patterns/04_parallelization/langgraph_parallelization.py`
+
+**LangGraphの特徴を活用**:
+- 複数のワークフローグラフ（セクショニング、投票、レビュー）
+- 非同期処理による真の並列実行
+- 結果統合の自動化
+- 処理タイプ別の最適化
+
+**実行方法**:
+```bash
+python langgraph_patterns/04_parallelization/langgraph_parallelization.py
+```
+
+### 5. LangGraph Orchestrator-Workers
+**ファイル**: `langgraph_patterns/05_orchestrator_workers/langgraph_orchestrator_workers.py`
+
+**LangGraphの特徴を活用**:
+- 動的なタスク管理とワーカー割り当て
+- 依存関係の自動解決
+- 条件分岐による継続判定
+- 複雑なプロジェクト管理ワークフロー
+
+**実行方法**:
+```bash
+python langgraph_patterns/05_orchestrator_workers/langgraph_orchestrator_workers.py
+```
+
+### 6. LangGraph Evaluator-Optimizer
+**ファイル**: `langgraph_patterns/06_evaluator_optimizer/langgraph_evaluator_optimizer.py`
+
+**LangGraphの特徴を活用**:
+- 生成→評価→改善のループ制御
+- 目標スコア達成までの自動反復
+- 複数最適化タイプ（文章、翻訳、コード）
+- 評価履歴の完全な追跡
+
+**実行方法**:
+```bash
+python langgraph_patterns/06_evaluator_optimizer/langgraph_evaluator_optimizer.py
+```
+
+### 7. LangGraph Agents
+**ファイル**: `langgraph_patterns/07_agents/langgraph_agents.py`
+
+**LangGraphの特徴を活用**:
+- 自律的な意思決定フロー
+- 複数ツールの統合管理
+- 動的なアクション選択と実行
+- 進捗監視と継続判定
+
+**実行方法**:
+```bash
+python langgraph_patterns/07_agents/langgraph_agents.py
+```
+
 ## 🎯 学習のポイント
 
-### 初心者向け
+### 初心者向け（patterns/フォルダから開始）
 1. まず `01_augmented_llm` から始めて、基本的なツール使用を理解
 2. `02_prompt_chaining` で段階的なタスク分解を学習
 3. `03_routing` で条件分岐の実装を理解
@@ -168,10 +289,11 @@ python patterns/07_agents/agents.py
 2. `05_orchestrator_workers` で複雑なワークフロー管理を学習
 3. `06_evaluator_optimizer` で品質改善プロセスを理解
 
-### 上級者向け
-1. `07_agents` で自律エージェントの実装を学習
-2. 各パターンを組み合わせたハイブリッドシステムの構築
-3. 独自のツールやワーカーの開発
+### 上級者向け（langgraph_patterns/フォルダで実践）
+1. LangGraphの状態管理と条件分岐を理解
+2. 複雑なワークフローの設計と実装
+3. 実用的なエージェントシステムの構築
+4. 各パターンを組み合わせたハイブリッドシステムの開発
 
 ## 🔧 カスタマイズ
 
@@ -204,24 +326,46 @@ class WorkerType:
 ### 評価基準のカスタマイズ
 `06_evaluator_optimizer/evaluator_optimizer.py`の`EvaluationCriteria`クラスに新しい評価基準を追加できます。
 
+## ⚡ LangGraphの利点
+
+### 1. 明確なワークフロー定義
+- StateGraphによる視覚的で理解しやすいフロー
+- ノードとエッジによる処理ステップの明確化
+
+### 2. 高度な条件分岐
+- 動的な経路選択
+- 複雑な条件に基づく処理分岐
+
+### 3. 状態管理
+- TypedDictによる型安全な状態管理
+- 各ステップ間での情報の確実な受け渡し
+
+### 4. エラーハンドリング
+- 各ノードでのエラー処理
+- 失敗時の代替経路設定
+
+### 5. 並列処理サポート
+- 複数ワークフローの並行実行
+- 非同期処理による性能向上
+
 ## 📊 パフォーマンス考慮事項
 
 - **API使用量**: 各パターンは複数のLLM呼び出しを行うため、APIコストに注意
-- **実行時間**: 並列化パターンは処理時間を短縮しますが、複雑なパターンは時間がかかる場合があります
-- **メモリ使用量**: 大量のデータを扱う場合は、メモリ使用量に注意してください
+- **実行時間**: LangGraphパターンは構造化により若干のオーバーヘッドがありますが、並列化により全体的には高速
+- **メモリ使用量**: 状態管理により基本パターンより多くのメモリを使用する場合があります
 
 ## 🐛 トラブルシューティング
 
 ### よくある問題
 
 1. **APIキーエラー**: `.env`ファイルにOpenAI APIキーが正しく設定されているか確認
-2. **パッケージインポートエラー**: 必要なパッケージがすべてインストールされているか確認
+2. **パッケージインポートエラー**: `langgraph`パッケージが正しくインストールされているか確認
 3. **レート制限エラー**: OpenAI APIのレート制限に達した場合は、しばらく待ってから再実行
 
 ### デバッグのヒント
 
 - 各パターンには詳細なログ出力が含まれています
-- `verbose=True`オプションを使用してより詳細な情報を取得
+- LangGraphパターンでは実行ログで各ステップの状態を確認可能
 - エラー時は実行ログを確認して問題の箇所を特定
 
 ## 📖 参考資料
