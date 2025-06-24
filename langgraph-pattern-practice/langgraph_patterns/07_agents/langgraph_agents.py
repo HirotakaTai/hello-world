@@ -15,17 +15,12 @@ from typing import TypedDict
 from dotenv import load_dotenv
 from langchain.tools import BaseTool
 from langchain_core.messages import HumanMessage
-from langchain_core.pydantic_v1 import BaseModel
-from langchain_core.pydantic_v1 import Field
-
-# LangChain関連のインポート
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END
-
-# LangGraph関連のインポート
 from langgraph.graph import StateGraph
-from langgraph.prebuilt import ToolExecutor
-from langgraph.prebuilt import ToolInvocation
+from langgraph.prebuilt import ToolNode
+from pydantic import BaseModel
+from pydantic import Field
 
 # ===== 環境変数の読み込み =====
 load_dotenv()
@@ -43,9 +38,9 @@ class WebSearchInput(BaseModel):
 class WebSearchTool(BaseTool):
     """Web検索ツール（モック実装）"""
 
-    name = "web_search"
-    description = "Webから情報を検索します。最新の情報やニュースを取得できます。"
-    args_schema = WebSearchInput
+    name: str = "web_search"
+    description: str = "Webから情報を検索します。最新の情報やニュースを取得できます。"
+    args_schema: type[BaseModel] = WebSearchInput
 
     def _run(self, query: str, max_results: int = 5) -> str:
         """Web検索を実行（モック実装）"""
@@ -75,9 +70,9 @@ class FileOperationInput(BaseModel):
 class FileOperationTool(BaseTool):
     """ファイル操作ツール"""
 
-    name = "file_operation"
-    description = "ファイルの読み書きを行います。テキストファイルの読み取り、作成、追記が可能です。"
-    args_schema = FileOperationInput
+    name: str = "file_operation"
+    description: str = "ファイルの読み書きを行います。テキストファイルの読み取り、作成、追記が可能です。"
+    args_schema: type[BaseModel] = FileOperationInput
 
     def _run(self, operation: str, filename: str, content: str = "") -> str:
         """ファイル操作を実行"""
@@ -117,11 +112,11 @@ class DataAnalysisInput(BaseModel):
 class DataAnalysisTool(BaseTool):
     """データ分析ツール"""
 
-    name = "data_analysis"
-    description = (
+    name: str = "data_analysis"
+    description: str = (
         "データの分析を行います。統計サマリー、トレンド分析、相関分析が可能です。"
     )
-    args_schema = DataAnalysisInput
+    args_schema: type[BaseModel] = DataAnalysisInput
 
     def _run(self, data: str, analysis_type: str) -> str:
         """データ分析を実行（簡易実装）"""
@@ -150,9 +145,9 @@ class TaskPlanningInput(BaseModel):
 class TaskPlanningTool(BaseTool):
     """タスク計画ツール"""
 
-    name = "task_planning"
-    description = "目標達成のためのタスク計画を作成します。リソースと制約を考慮した実行可能な計画を生成します。"
-    args_schema = TaskPlanningInput
+    name: str = "task_planning"
+    description: str = "目標達成のためのタスク計画を作成します。リソースと制約を考慮した実行可能な計画を生成します。"
+    args_schema: type[BaseModel] = TaskPlanningInput
 
     def _run(self, goal: str, resources: str, constraints: str) -> str:
         """タスク計画を作成"""
@@ -222,8 +217,8 @@ class LangGraphAgents:
             TaskPlanningTool(),
         ]
 
-        # ツール実行器を作成
-        self.tool_executor = ToolExecutor(self.tools)
+        # ツールノードを作成（最新のLangGraph APIを使用）
+        self.tool_node = ToolNode(self.tools)
 
         # LLMにツール情報をバインド
         self.llm_with_tools = self.llm.bind_tools(self.tools)
@@ -406,12 +401,20 @@ class LangGraphAgents:
             print(f"🔧 ツール '{tool_call['name']}' を実行中...")
 
             try:
-                # ツール実行
-                action = ToolInvocation(
-                    tool=tool_call["name"], tool_input=tool_call["args"]
-                )
-                result = self.tool_executor.invoke(action)
-                execution_results.append(f"{tool_call['name']}: {str(result)}")
+                # ツール実行（新しいAPIを使用）
+                # 注意: この部分は簡易実装で、実際のToolNodeを使用する場合は
+                # より詳細な実装が必要です
+                tool_name = tool_call["name"]
+                tool_args = tool_call["args"]
+
+                # ツール名に基づいて適切なツールを実行
+                for tool in self.tools:
+                    if tool.name == tool_name:
+                        result = tool.run(tool_args)
+                        execution_results.append(f"{tool_call['name']}: {str(result)}")
+                        break
+                else:
+                    raise ValueError(f"ツールが見つかりません: {tool_name}")
 
                 print(f"✅ ツール実行完了: {tool_call['name']}")
 

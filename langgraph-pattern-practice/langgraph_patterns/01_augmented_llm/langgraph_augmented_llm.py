@@ -18,18 +18,13 @@ from langchain.tools import BaseTool
 from langchain_core.messages import AIMessage
 from langchain_core.messages import HumanMessage
 from langchain_core.messages import ToolMessage
-from langchain_core.pydantic_v1 import BaseModel
-from langchain_core.pydantic_v1 import Field
-
-# LangChain関連のインポート
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END
-
-# LangGraph関連のインポート
 from langgraph.graph import StateGraph
 from langgraph.graph.message import add_messages
-from langgraph.prebuilt import ToolExecutor
-from langgraph.prebuilt import ToolInvocation
+from langgraph.prebuilt import ToolNode
+from pydantic import BaseModel
+from pydantic import Field
 
 # ===== 環境変数の読み込み =====
 load_dotenv()
@@ -46,9 +41,11 @@ class CalculatorInput(BaseModel):
 class Calculator(BaseTool):
     """安全な数式計算を行うツール"""
 
-    name = "calculator"
-    description = "数学計算を実行します。四則演算、べき乗、平方根などが使用できます。"
-    args_schema = CalculatorInput
+    name: str = "calculator"
+    description: str = (
+        "数学計算を実行します。四則演算、べき乗、平方根などが使用できます。"
+    )
+    args_schema: type[BaseModel] = CalculatorInput
 
     def _run(self, expression: str) -> str:
         """計算を実行する内部メソッド"""
@@ -75,9 +72,9 @@ class TimeInput(BaseModel):
 class CurrentTime(BaseTool):
     """現在時刻を取得するツール"""
 
-    name = "current_time"
-    description = "現在の日時を取得します。"
-    args_schema = TimeInput
+    name: str = "current_time"
+    description: str = "現在の日時を取得します。"
+    args_schema: type[BaseModel] = TimeInput
 
     def _run(self, timezone: str = "Asia/Tokyo") -> str:
         """現在時刻を取得する内部メソッド"""
@@ -94,9 +91,9 @@ class WeatherInput(BaseModel):
 class Weather(BaseTool):
     """天気情報を取得するツール（モックデータ）"""
 
-    name = "weather"
-    description = "指定した場所の天気情報を取得します。"
-    args_schema = WeatherInput
+    name: str = "weather"
+    description: str = "指定した場所の天気情報を取得します。"
+    args_schema: type[BaseModel] = WeatherInput
 
     def _run(self, location: str) -> str:
         """天気情報を取得する内部メソッド（モックデータを返す）"""
@@ -144,8 +141,8 @@ class LangGraphAugmentedLLM:
             Weather(),  # 天気情報取得ツール
         ]
 
-        # ツール実行器を作成
-        self.tool_executor = ToolExecutor(self.tools)
+        # ツールノードを作成（最新のLangGraph APIを使用）
+        self.tool_node = ToolNode(self.tools)
 
         # LLMにツール情報をバインド
         self.llm_with_tools = self.llm.bind_tools(self.tools)
@@ -164,7 +161,7 @@ class LangGraphAugmentedLLM:
 
         # ノード（処理ステップ）を追加
         workflow.add_node("agent", self._call_model)  # LLMを呼び出すノード
-        workflow.add_node("action", self._call_tool)  # ツールを実行するノード
+        workflow.add_node("action", self.tool_node)  # ツールを実行するノード
 
         # エントリーポイントを設定
         workflow.set_entry_point("agent")
@@ -195,38 +192,6 @@ class LangGraphAugmentedLLM:
 
         # 新しいメッセージを状態に追加して返す
         return {"messages": [response]}
-
-    def _call_tool(self, state: GraphState) -> Dict[str, Any]:
-        """ツールを実行するノード処理"""
-        print("🔧 ツールを実行中...")
-        messages = state["messages"]
-
-        # 最後のメッセージ（AIの応答）を取得
-        last_message = messages[-1]
-
-        # ツール呼び出し情報を取得
-        tool_calls = last_message.tool_calls
-
-        # 各ツール呼び出しを実行
-        tool_messages = []
-        for tool_call in tool_calls:
-            print(f"⚡ ツール '{tool_call['name']}' を実行: {tool_call['args']}")
-
-            # ツール実行
-            action = ToolInvocation(
-                tool=tool_call["name"], tool_input=tool_call["args"]
-            )
-            result = self.tool_executor.invoke(action)
-
-            # ツール実行結果をメッセージとして作成
-            tool_message = ToolMessage(
-                content=str(result), tool_call_id=tool_call["id"]
-            )
-            tool_messages.append(tool_message)
-
-            print(f"📋 ツール実行結果: {result}")
-
-        return {"messages": tool_messages}
 
     def _should_continue(self, state: GraphState) -> str:
         """処理を続行するかどうかを判定する条件分岐関数"""

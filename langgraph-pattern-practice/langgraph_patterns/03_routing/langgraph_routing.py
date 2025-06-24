@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 LangGraph版 Routing Pattern
-LangGraphを使用して入力を分類し、適切な処理経路に振り分けるパターン
+LangGraphを使用してクエリを分類し、適切な処理経路に振り分けるパターン
 """
 
 import datetime
@@ -15,15 +15,11 @@ from typing import TypedDict
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.pydantic_v1 import BaseModel
-from langchain_core.pydantic_v1 import Field
-
-# LangChain関連のインポート
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END
-
-# LangGraph関連のインポート
 from langgraph.graph import StateGraph
+from pydantic import BaseModel
+from pydantic import Field
 
 # ===== 環境変数の読み込み =====
 load_dotenv()
