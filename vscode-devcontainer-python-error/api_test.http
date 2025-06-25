@@ -1,0 +1,26 @@
+# FastAPI REST Client テストファイル
+# VS Code REST Client拡張機能で使用
+
+### ヘルスチェック
+GET http://localhost:8000/health
+
+### ルートエンドポイント
+GET http://localhost:8000/
+
+### OpenAPI仕様書
+GET http://localhost:8000/api/v1/openapi.json
+
+### ユーザー一覧取得
+GET http://localhost:8000/api/v1/users
+
+### ユーザー作成
+POST http://localhost:8000/api/v1/users
+Content-Type: application/json
+
+{
+  "name": "テストユーザー",
+  "email": "test@example.com"
+}
+
+### 特定ユーザー取得
+GET http://localhost:8000/api/v1/users/1

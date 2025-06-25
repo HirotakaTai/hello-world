@@ -1,0 +1,50 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/postgres
+{
+	"name": "FastAPI & PostgreSQL",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"features": {
+		"ghcr.io/jsburckhardt/devcontainer-features/ruff:1": {},
+		"ghcr.io/va-h/devcontainers-features/uv:1": {}
+	},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or the host.
+	"forwardPorts": [
+		8000,
+		5432
+	],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "uv sync --dev --no-build-isolation && chmod +x scripts/*.sh",
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.black-formatter",
+				"charliermarsh.ruff",
+				"ms-python.mypy-type-checker",
+				"ms-toolsai.jupyter",
+				"ms-vscode.vscode-json",
+				"redhat.vscode-yaml",
+				"ms-azuretools.vscode-docker",
+				"humao.rest-client"
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "/usr/local/bin/python",
+				"python.linting.enabled": true,
+				"python.linting.pylintEnabled": false,
+				"python.linting.flake8Enabled": false,
+				"python.formatting.provider": "black",
+				"python.formatting.blackPath": "/usr/local/bin/black",
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.organizeImports": "explicit"
+				}
+			}
+		}
+	}
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
