@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI LangGraph Chat</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background-color: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .chat-area {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+        .user-message {
+            background-color: #2563eb;
+            color: white;
+            margin-left: auto;
+        }
+        .assistant-message {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .input-area {
+            display: flex;
+            padding: 20px;
+            gap: 10px;
+        }
+        .message-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .send-button {
+            padding: 12px 24px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .send-button:hover {
+            background-color: #1d4ed8;
+        }
+        .send-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            color: #6b7280;
+        }
+        .error {
+            background-color: #fef2f2;
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 20px;
+        }
+        .timestamp {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>FastAPI LangGraph Chat</h1>
+            <p>LangGraphを使用したAIエージェントチャットボット</p>
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message assistant-message">
+                <div>こんにちは！何かお手伝いできることはありますか？</div>
+                <div class="timestamp">システムメッセージ</div>
+            </div>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div>処理中...</div>
+        </div>
+        
+        <div class="input-area">
+            <input 
+                type="text" 
+                id="messageInput" 
+                class="message-input" 
+                placeholder="メッセージを入力してください..."
+                maxlength="1000"
+            >
+            <button id="sendButton" class="send-button">送信</button>
+        </div>
+    </div>
+
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const loading = document.getElementById('loading');
+
+        let conversationId = null;
+
+        // メッセージを送信
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // UI更新
+            addMessage(message, 'user');
+            messageInput.value = '';
+            sendButton.disabled = true;
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversation_id: conversationId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    conversationId = data.conversation_id;
+                    addMessage(data.response, 'assistant', data.timestamp);
+                } else {
+                    showError('エラー: ' + data.detail);
+                }
+            } catch (error) {
+                showError('通信エラーが発生しました: ' + error.message);
+            } finally {
+                sendButton.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        // メッセージをUIに追加
+        function addMessage(content, role, timestamp = null) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.textContent = content;
+            messageDiv.appendChild(contentDiv);
+            
+            if (timestamp) {
+                const timestampDiv = document.createElement('div');
+                timestampDiv.className = 'timestamp';
+                timestampDiv.textContent = new Date(timestamp).toLocaleString('ja-JP');
+                messageDiv.appendChild(timestampDiv);
+            }
+            
+            chatArea.appendChild(messageDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+
+        // エラーメッセージを表示
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error';
+            errorDiv.textContent = message;
+            chatArea.appendChild(errorDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            
+            // 5秒後にエラーメッセージを削除
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        // イベントリスナー
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // 初期フォーカス
+        messageInput.focus();
+    </script>
+</body>
+</html>
