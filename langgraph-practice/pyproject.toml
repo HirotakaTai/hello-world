@@ -1,0 +1,96 @@
+[project]
+name = "langgraph-practice"
+version = "0.1.0"
+description = "LangGraph advanced learning project with error handling and streaming"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    {name = "LangGraph学習者"}
+]
+keywords = ["langgraph", "langchain", "ai", "chatbot", "streaming"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    # LangGraph 0.2系 (安定版)
+    "langgraph>=0.2.20,<0.3.0",
+    "langchain>=0.2.0,<0.3.0", 
+    "langchain-openai>=0.1.0",
+    "langchain-community>=0.2.0",
+    "langgraph-checkpoint-sqlite>=1.0.0",
+    
+    # ストリーミングとUI
+    "rich>=13.0.0",
+    "typer>=0.12.0",
+    
+    # データ処理と検証
+    "pydantic>=2.0.0",
+    "structlog>=23.0.0",
+    
+    # 環境管理
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.5.0",
+]
+
+[project.scripts]
+chat = "langgraph_practice.scripts.run_chat:main"
+benchmark = "langgraph_practice.scripts.benchmark:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
